@@ -1,5 +1,5 @@
 /**!
- * lightgallery.js | 1.1.3 | February 11th 2019
+ * lightgallery.js | 1.1.3 | February 18th 2020
  * http://sachinchoolur.github.io/lightgallery.js/
  * Copyright (c) 2016 Sachin N; 
  * @license GPLv3 
@@ -625,6 +625,8 @@
             };
         }
 
+        if (!src.match) return;
+
         var youtube = src.match(/\/\/(?:www\.)?youtu(?:\.be|be\.com|be-nocookie\.com)\/(?:watch\?v=|embed\/)?([a-z0-9\-\_\%]+)/i);
         var vimeo = src.match(/\/\/(?:www\.)?vimeo.com\/([0-9a-z\-_]+)/i);
         var dailymotion = src.match(/\/\/(?:www\.)?dai.ly\/([0-9a-z\-_]+)/i);
@@ -745,7 +747,7 @@
      *  @param {Boolean} rec - if true call loadcontent() function again.
      *  @param {Boolean} delay - delay for adding complete class. it is 0 except first time.
      */
-    Plugin.prototype.loadContent = function (index, rec, delay) {
+    Plugin.prototype.loadContent = async function (index, rec, delay) {
 
         var _this = this;
         var _hasPoster = false;
@@ -796,6 +798,13 @@
 
             _srcset = _this.s.dynamicEl[index].srcset;
             _sizes = _this.s.dynamicEl[index].sizes;
+
+            if (typeof _src === 'function') {
+                _src = _src(_this.s.dynamicEl[index]);
+                if (_src.then) {
+                    _src = await _src;
+                }
+            }
         } else {
 
             if (_this.items[index].getAttribute('data-poster')) {
